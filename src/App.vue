@@ -17,7 +17,12 @@ export default {
       camera: null,
       scene: null,
       renderer: null,
-      mesh: null
+      mesh: null,
+      light1: null,
+      light2: null,
+      light3: null,
+      light4: null,
+      clock: new THREE.Clock()
     };
   },
   methods: {
@@ -45,15 +50,52 @@ export default {
       );
       controls.screenSpacePanning = true;
     },
-    animate: function() {
-      this.renderer.render(this.scene, this.camera);
+    animate() {
       requestAnimationFrame(this.animate);
-
       // Anything after to animate
+
+      this.render();
+    },
+    render() {
+      var time = Date.now() * 0.0005;
+      this.light1.position.x = Math.sin(time * 0.7) * 30;
+      this.light1.position.y = Math.cos(time * 0.5) * 40;
+      this.light1.position.z = Math.cos(time * 0.3) * 30;
+      this.light2.position.x = Math.cos(time * 0.3) * 30;
+      this.light2.position.y = Math.sin(time * 0.5) * 40;
+      this.light2.position.z = Math.sin(time * 0.7) * 30;
+      this.light3.position.x = Math.sin(time * 0.7) * 30;
+      this.light3.position.y = Math.cos(time * 0.3) * 40;
+      this.light3.position.z = Math.sin(time * 0.5) * 30;
+      this.light4.position.x = Math.sin(time * 0.3) * 30;
+      this.light4.position.y = Math.cos(time * 0.7) * 40;
+      this.light4.position.z = Math.sin(time * 0.5) * 30;
+
+      this.renderer.render(this.scene, this.camera);
     },
     addLight() {
-      var light = new THREE.AmbientLight(0xffffff); // soft white light
-      this.scene.add(light);
+      let sphere = new THREE.SphereBufferGeometry(0.5, 16, 8);
+
+      this.light1 = new THREE.PointLight(0xff0040, 2, 50);
+      this.light1.add(
+        new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xff0040 }))
+      );
+      this.scene.add(this.light1);
+      this.light2 = new THREE.PointLight(0x0040ff, 2, 50);
+      this.light2.add(
+        new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x0040ff }))
+      );
+      this.scene.add(this.light2);
+      this.light3 = new THREE.PointLight(0x80ff80, 2, 50);
+      this.light3.add(
+        new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x80ff80 }))
+      );
+      this.scene.add(this.light3);
+      this.light4 = new THREE.PointLight(0xffaa00, 2, 50);
+      this.light4.add(
+        new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xffaa00 }))
+      );
+      this.scene.add(this.light4);
     },
     addHelper() {
       var helper = new THREE.GridHelper(160, 10);
@@ -122,21 +164,6 @@ export default {
 
         this.scene.add(mesh);
       });
-    },
-    oilTexture(mesh) {
-      let uniforms = {
-        u_time: { type: "f", value: 1.0 },
-        u_resolution: { type: "v2", value: new THREE.Vector2() },
-        u_mouse: { type: "v2", value: new THREE.Vector2() }
-      };
-
-      let material = new THREE.ShaderMaterial({
-        uniforms: uniforms,
-        vertexShader: document.getElementById("vertexShader").textContent,
-        fragmentShader: document.getElementById("fragmentShader").textContent
-      });
-
-      mesh.material = material;
     }
   },
   mounted() {
@@ -149,9 +176,9 @@ export default {
     // this.addTestMesh();
     this.addHelper();
 
-    this.loadVoxel("garage-84-oil", { x: 1, y: 0, z: 0 }, this.oilTexture);
-    this.loadVoxel("newspaper1", { x: 1, y: 20, z: 10 });
-    this.loadVoxel("garage-1-robotarm-3", { x: 1, y: 20, z: 10 });
+    this.loadVoxel("garage-94-delorean", { x: 1, y: 0, z: 0 });
+    // this.loadVoxel("newspaper1", { x: 1, y: 20, z: 10 });
+    // this.loadVoxel("garage-1-robotarm-3", { x: 1, y: 20, z: 10 });
     this.animate();
   }
 };
