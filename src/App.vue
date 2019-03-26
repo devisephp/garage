@@ -24,7 +24,12 @@ export default {
       light4: null,
       clock: new THREE.Clock(),
       voxelModelNamesIndex: 0,
-      voxelModelNames: ["garage-94-delorean","newspaper1","garage-1-robotarm-3", "garage-88-floor"],
+      voxelModelNames: [
+        "garage-94-delorean",
+        "newspaper1",
+        "garage-1-robotarm-3",
+        "garage-88-floor"
+      ],
       voxelModels: {}
     };
   },
@@ -74,13 +79,19 @@ export default {
       this.light4.position.y = Math.cos(time * 0.7) * 40;
       this.light4.position.z = Math.sin(time * 0.5) * 30;
 
-      if(this.voxelModels.hasOwnProperty("garage-94-delorean")) {
+      if (this.voxelModels.hasOwnProperty("garage-94-delorean")) {
         // this.voxelModels["garage-94-delorean"].position.x += 2;
       }
 
       this.renderer.render(this.scene, this.camera);
     },
     addLight() {
+      let hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+      hemiLight.color.setHSL(0.6, 1, 0.6);
+      hemiLight.groundColor.setHSL(0.095, 1, 0.75);
+      hemiLight.position.set(0, 50, 0);
+      this.scene.add(hemiLight);
+
       let sphere = new THREE.SphereBufferGeometry(0.5, 16, 8);
 
       this.light1 = new THREE.PointLight(0xff0040, 2, 50);
@@ -149,11 +160,13 @@ export default {
       this.scene.add(cb);
     },
     loadCurrentVoxel() {
-      if(typeof this.voxelModelNames[this.voxelModelNamesIndex] !== 'undefined') {
+      if (
+        typeof this.voxelModelNames[this.voxelModelNamesIndex] !== "undefined"
+      ) {
         var parser = new vox.Parser();
         var modelName = this.voxelModelNames[this.voxelModelNamesIndex];
         parser.parse(`models/${modelName}.vox`).then(voxelData => {
-          var param = {voxelSize: 1};
+          var param = { voxelSize: 1 };
           var builder = new vox.MeshBuilder(voxelData, param);
           var mesh = builder.createMesh();
 
@@ -169,22 +182,46 @@ export default {
     onVoxelLoadComplete() {
       this.placeVoxelModels();
     },
-    placeVoxelModels(){
-      var newfloor1 = this.voxelModels["garage-88-floor"].clone();
-      newfloor1.position.set(0,0,0); // or any other coordinates
-      this.scene.add(newfloor1);
+    placeVoxelModels() {
+      let newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(0, 0, 0); // or any other coordinates
+      this.scene.add(newfloor);
 
-      var newfloor2 = this.voxelModels["garage-88-floor"].clone();
-      newfloor2.position.set(260,0,0); // or any other coordinates
-      this.scene.add(newfloor2);
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(126, 0, 0); // or any other coordinates
+      this.scene.add(newfloor);
 
-      var newfloor3 = this.voxelModels["garage-88-floor"].clone();
-      newfloor3.position.set(0,260,0); // or any other coordinates
-      this.scene.add(newfloor3);
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(-126, 0, 0); // or any other coordinates
+      this.scene.add(newfloor);
 
-      var newfloor4 = this.voxelModels["garage-88-floor"].clone();
-      newfloor4.position.set(0,0,260); // or any other coordinates
-      this.scene.add(newfloor4);
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(0, 0, 126); // or any other coordinates
+      this.scene.add(newfloor);
+
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(126, 0, 126); // or any other coordinates
+      this.scene.add(newfloor);
+
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(-126, 0, 126); // or any other coordinates
+      this.scene.add(newfloor);
+
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(0, 0, -126); // or any other coordinates
+      this.scene.add(newfloor);
+
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(126, 0, -126); // or any other coordinates
+      this.scene.add(newfloor);
+
+      newfloor = this.voxelModels["garage-88-floor"].clone();
+      newfloor.position.set(-126, 0, -126); // or any other coordinates
+      this.scene.add(newfloor);
+
+      // var newfloor4 = this.voxelModels["garage-88-floor"].clone();
+      // newfloor4.position.set(0,0,260); // or any other coordinates
+      // this.scene.add(newfloor4);
     }
   },
   mounted() {
