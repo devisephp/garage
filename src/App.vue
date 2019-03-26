@@ -22,7 +22,10 @@ export default {
       light2: null,
       light3: null,
       light4: null,
-      clock: new THREE.Clock()
+      clock: new THREE.Clock(),
+      voxelModelNamesIndex: 0,
+      voxelModelNames: ["garage-94-delorean","newspaper1","garage-1-robotarm-3", "garage-88-floor"],
+      voxelModels: {}
     };
   },
   methods: {
@@ -70,6 +73,10 @@ export default {
       this.light4.position.x = Math.sin(time * 0.3) * 30;
       this.light4.position.y = Math.cos(time * 0.7) * 40;
       this.light4.position.z = Math.sin(time * 0.5) * 30;
+
+      if(this.voxelModels.hasOwnProperty("garage-94-delorean")) {
+        // this.voxelModels["garage-94-delorean"].position.x += 2;
+      }
 
       this.renderer.render(this.scene, this.camera);
     },
@@ -141,29 +148,43 @@ export default {
 
       this.scene.add(cb);
     },
-    loadVoxel(modelName, position, material) {
-      var parser = new vox.Parser();
-      parser.parse(`models/${modelName}.vox`).then(voxelData => {
-        voxelData.voxels; // voxel position and color data
-        voxelData.size; // model size
-        voxelData.palette; // palette data
+    loadCurrentVoxel() {
+      if(typeof this.voxelModelNames[this.voxelModelNamesIndex] !== 'undefined') {
+        var parser = new vox.Parser();
+        var modelName = this.voxelModelNames[this.voxelModelNamesIndex];
+        parser.parse(`models/${modelName}.vox`).then(voxelData => {
+          var param = {voxelSize: 1};
+          var builder = new vox.MeshBuilder(voxelData, param);
+          var mesh = builder.createMesh();
 
-        var param = { voxelSize: 1 };
-        var builder = new vox.MeshBuilder(voxelData, param);
-        var mesh = builder.createMesh();
+          this.scene.add(mesh);
+          this.voxelModels[modelName] = mesh;
+          this.voxelModelNamesIndex++;
+          this.loadCurrentVoxel();
+        });
+      } else {
+        this.onVoxelLoadComplete();
+      }
+    },
+    onVoxelLoadComplete() {
+      this.placeVoxelModels();
+    },
+    placeVoxelModels(){
+      var newfloor1 = this.voxelModels["garage-88-floor"].clone();
+      newfloor1.position.set(0,0,0); // or any other coordinates
+      this.scene.add(newfloor1);
 
-        if (material) {
-          material(mesh);
-        }
+      var newfloor2 = this.voxelModels["garage-88-floor"].clone();
+      newfloor2.position.set(260,0,0); // or any other coordinates
+      this.scene.add(newfloor2);
 
-        if (position) {
-          mesh.position.x = position.x;
-          mesh.position.y = position.y;
-          mesh.position.z = position.z;
-        }
+      var newfloor3 = this.voxelModels["garage-88-floor"].clone();
+      newfloor3.position.set(0,260,0); // or any other coordinates
+      this.scene.add(newfloor3);
 
-        this.scene.add(mesh);
-      });
+      var newfloor4 = this.voxelModels["garage-88-floor"].clone();
+      newfloor4.position.set(0,0,260); // or any other coordinates
+      this.scene.add(newfloor4);
     }
   },
   mounted() {
@@ -176,7 +197,8 @@ export default {
     // this.addTestMesh();
     this.addHelper();
 
-    this.loadVoxel("garage-94-delorean", { x: 1, y: 0, z: 0 });
+    this.loadCurrentVoxel();
+
     // this.loadVoxel("newspaper1", { x: 1, y: 20, z: 10 });
     // this.loadVoxel("garage-1-robotarm-3", { x: 1, y: 20, z: 10 });
     this.animate();
